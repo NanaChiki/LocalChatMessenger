@@ -1,5 +1,4 @@
 import socket
-import sys
 import os
 from datetime import datetime
 
@@ -22,47 +21,54 @@ def main():
     server_address = '/tmp/udp_socket_file'
     client_address = '/tmp/udp_client_socket_file'
 
+
+    # Create a loop that allows multiple messages without restarting
     try:
         # Cleanup any existing client socket file
         cleanup_socket_file(client_address)
-
         # Bind client socket file to the socket
         sock.bind(client_address)
         sock.settimeout(5.0) # Set timeout
 
         print("🚀 UDP Client started! Type 'quit' to exit.")
 
-        # Create a loop that allows multiple messages without restarting
         while True:
             message = input("Enter your message (or 'quit' to exit): ")
             if message.lower() in ['quit', 'exit', 'q']:
                 print("Goodbye!")
                 break # This exists the while loop
-            
-            timestamp = get_timestamp()
-            sock.sendto(message.encode(), server_address)
-            print(f'📤 [{timestamp}] Sending to Server: {message}')
+            try:
+                # Send message
+                timestamp = get_timestamp()
+                sock.sendto(message.encode(), server_address)
+                print(f'📤 [{timestamp}] Sending to Server: {message}')
 
-            # Receive 4096 bytes data at the maximum
-            print('Waiting to receive...')
-            
-            data, server = sock.recvfrom(4096)
-            timestamp = get_timestamp()
-            # Display the received data from the server
-            print('📩 [{a}] Received: {!r}, Server address: {}'.format(timestamp, data, server))
+                print('Waiting to receive...')
+                # Receive 4096 bytes data at the maximum
+                data, server = sock.recvfrom(4096)
+                timestamp = get_timestamp()
+                response = data.decode() # Show Data instead of b'Data'
+                # Display the received data from the server
+                print(f'📩 [{timestamp}] Received: {response}, Server address: {server}')
+    
+            except socket.timeout:
+                print("⚠️ Server did not respond within 5 seconds. Server might be down.")
+                print("   Continue sending messages or type 'quit' to exit.")
+                continue
+
+            except Exception as e:
+                print(f"❌ Error communicating with server: {e}")
+                print("    Try again or type 'quit' to exit.")
+                continue
     
     except KeyboardInterrupt:
         print("\n👋 Client interrupted by user")
 
-    except socket.timeout:
-        print("⚠️ Server did not respond within 5 seconds. Server might be down.")
-        print("   Continue sending messages or type 'quit' to exit.")
-
     except ConnectionRefusedError:
-        print("❌ Cloud not connect to server. Is the server running?")
-
+        print("❌ Could not connect to server. Is the server running?")
+    
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"❌ Fatal error: {e}")
 
     finally:
         # Cleanup
