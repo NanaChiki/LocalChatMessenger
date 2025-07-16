@@ -1,1 +1,27 @@
+# Virtual Environment
 venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Socket files
+/tmp/udp_socket_file
+/tmp/udp_client_socket_file
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ignore all files in the exercises directory
+exercises/
