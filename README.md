@@ -1,5 +1,8 @@
 # Local Chat Messenger
 
+![Live demo](assets/demo.gif)
+*The demo shows client-server communication with timestamp logging and various message types.*
+
 A UDP-based chat application built with Python that demonstrates socket programming concepts.
 
 ## Features
